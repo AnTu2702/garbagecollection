@@ -92,7 +92,8 @@ def lambda_handler(event, context):
 		client = boto3.client('sns')
 		response = client.publish(
 		    TargetArn='arn:aws:sns:eu-central-1:985033182960:BURGENRING23_ABFALL',
-		    Message=message.rstrip(", ")
+		    Message=message.rstrip(", "),
+		    Subject=u'Müllabfuhr'
 		)
 
 lambda_handler('', '')
