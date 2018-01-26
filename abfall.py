@@ -49,7 +49,7 @@ def lambda_handler(event, context):
 			while True:
 				fourWeeks = td(weeks = 4)
 				nextDate = firstDate+fourWeeks
-				if nextDate > dt.strptime("2019-12-31","%Y-%m-%d"):
+				if nextDate > dt.strptime("2025-12-31","%Y-%m-%d"):
 					break
 				date += str(nextDate.strftime('%d.%m.%Y')) + ", "
 				firstDate = nextDate
@@ -57,8 +57,8 @@ def lambda_handler(event, context):
 		elif row[1].text.rstrip(", ") == u"Biotonne":
 			sort = u"Biomüll"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Gelber Sack":
-			sort = u"Gelber Sack"
+		elif row[1].text.rstrip(", ") == u"Gelbe Tonne":
+			sort = u"Gelbe Tonne"
 			date += row[2].text
 		elif row[1].text.rstrip(", ") == u"Sperrmüll auf Abruf":
 			sort = u"Sperrmüll"
