@@ -57,8 +57,8 @@ def lambda_handler(event, context):
 		elif row[1].text.rstrip(", ") == u"Biotonne":
 			sort = u"Biomüll"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Gelbe Tonne":
-			sort = u"Gelbe Tonne"
+		elif row[1].text.rstrip(", ") == u"Gelber Sack":
+			sort = u"Gelber Sack"
 			date += row[2].text
 		elif row[1].text.rstrip(", ") == u"Sperrmüll auf Abruf":
 			sort = u"Sperrmüll"
