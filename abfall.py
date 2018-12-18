@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import re
 import pytz
 import lxml
@@ -17,19 +18,26 @@ from lxml import etree
 
 def lambda_handler(event, context):
 
+	streetName = os.environ['STREET_NAME']
+	streetId = os.environ['STREET_ID']
+	houseNumber = os.environ['HOUSE_NUMBER']
+
 	url = 'https://stadtreinigung.giessen.de/akal/akal1.php?von=B&bis=C'
-	response = requests.post(url, data={u'strasse': u'46', u'hausnr': u'23'})
+	response = requests.post(url, data={u'strasse': streetId, u'hausnr': houseNumber})
 
 	copyright = "<meta name='author' content='Durth Roos Consulting GmbH, Darmstadt'>"
 	logo = "<br><img src='icons/logo.gif'>"
-	header = "<table width=100%> <tr><th><H2 align=left>Burgenring 23 </H2></th></tr></table>"
+	headerBegin = "<table width=100%> <tr><th><H2 align=left>"+streetName+" "+houseNumber
+	headerEnd = "</H2></th></tr></table>"
 
-	regex = r'(.*)' + re.escape(copyright) + r'(.?)' + re.escape(header) + r'(.*)' + re.escape(logo) + r'.*'
+	regex = r'(.*)' + re.escape(copyright) + r'(.?)' + re.escape(headerBegin) + r'(.*)' + re.escape(headerEnd) + r'(.*)' + re.escape(logo) + r'.*'
 
 	collectionsHtml = re.sub(' +',' ', response.text.replace("\r\n","").replace("\t"," "))
 
 	matchObj = re.match(regex, collectionsHtml)
-	collectionsXml = HTMLParser.HTMLParser().unescape(matchObj.group(3).replace("<br>",", ").replace("%","").replace("<b>"," ").replace("</b>"," "))
+	#print matchObj
+	
+	collectionsXml = HTMLParser.HTMLParser().unescape(matchObj.group(4).replace("<br>",", ").replace("%","").replace("<b>"," ").replace("</b>"," "))
 
 	messageDict = dict()
 
@@ -60,6 +68,9 @@ def lambda_handler(event, context):
 		elif row[1].text.rstrip(", ") == u"Gelber Sack":
 			sort = u"Gelber Sack"
 			date += row[2].text
+		elif row[1].text.rstrip(", ") == u"Gelbe Tonne":
+			sort = u"Gelbe Tonne"
+			date += row[2].text
 		elif row[1].text.rstrip(", ") == u"Sperrmüll auf Abruf":
 			sort = u"Sperrmüll"
 			date += row[2].text
@@ -87,7 +98,7 @@ def lambda_handler(event, context):
 		pass
 	else:
 		message = tomorrow.strftime('%d.%m.%Y') + ": " + message
-		#print message.rstrip(", ")
+		print message.rstrip(", ")
 
 		client = boto3.client('sns')
 		response = client.publish(
