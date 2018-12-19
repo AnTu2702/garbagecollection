@@ -21,6 +21,7 @@ def lambda_handler(event, context):
 	streetName = os.environ['STREET_NAME']
 	streetId = os.environ['STREET_ID']
 	houseNumber = os.environ['HOUSE_NUMBER']
+	awsAccountNumber = os.environ['AWS_ACCOUNT_NUMBER']
 
 	url = 'https://stadtreinigung.giessen.de/akal/akal1.php?von=B&bis=C'
 	response = requests.post(url, data={u'strasse': streetId, u'hausnr': houseNumber})
@@ -102,7 +103,7 @@ def lambda_handler(event, context):
 
 		client = boto3.client('sns')
 		response = client.publish(
-		    TargetArn='arn:aws:sns:eu-central-1:985033182960:'+streetName.upper()+houseNumber+'_ABFALL',
+		    TargetArn='arn:aws:sns:eu-central-1:'+awsAccountNumber+':'+streetName.upper()+houseNumber+'_ABFALL',
 		    Message=message.rstrip(", "),
 		    Subject=u'Müllabfuhr'
 		)
