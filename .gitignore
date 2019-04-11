@@ -22,7 +22,7 @@ dateutils-0.6.6-py2.7.egg-info/*
 idna/*
 idna-2.5.dist-info/*
 lxml/*
-lxml-3.8.0.dist-info/*
+lxml-4.3.3.dist-info/*
 python_dateutil-2.6.1.dist-info/*
 pytz/*
 pytz-2017.2.dist-info/*
