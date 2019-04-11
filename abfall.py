@@ -6,7 +6,7 @@ import pytz
 import lxml
 import requests
 import urllib
-import HTMLParser
+import html.parser
 import pytz
 import json
 import boto3
@@ -36,9 +36,9 @@ def lambda_handler(event, context):
 	collectionsHtml = re.sub(' +',' ', response.text.replace("\r\n","").replace("\t"," "))
 
 	matchObj = re.match(regex, collectionsHtml)
-	#print matchObj
+	print(matchObj)
 	
-	collectionsXml = HTMLParser.HTMLParser().unescape(matchObj.group(4).replace("<br>",", ").replace("%","").replace("<b>"," ").replace("</b>"," "))
+	collectionsXml = html.parser.unescape(matchObj.group(4).replace("<br>",", ").replace("%","").replace("<b>"," ").replace("</b>"," "))
 
 	messageDict = dict()
 
@@ -47,10 +47,10 @@ def lambda_handler(event, context):
 
 	for row in rows:
 		date = ''
-		if row[1].text.rstrip(", ") == u"Restmüll 4-wöchentlich":
+		if row[1].text.rstrip(", ").strip() == u"Restmüll 4-wöchentlich":
 			sort = u"Restmüll"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Altpapier 4-wöchentlich":
+		elif row[1].text.rstrip(", ").strip() == u"Altpapier 4-wöchentlich":
 			sort = u"Altpapier"
 			date += row[2].text
 			firstDate = dt.strptime("2017-01-11","%Y-%m-%d")
@@ -63,35 +63,39 @@ def lambda_handler(event, context):
 				date += str(nextDate.strftime('%d.%m.%Y')) + ", "
 				firstDate = nextDate
 
-		elif row[1].text.rstrip(", ") == u"Biotonne":
+		elif row[1].text.rstrip(", ").strip() == u"Biotonne":
 			sort = u"Biomüll"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Gelber Sack":
+		elif row[1].text.rstrip(", ").strip() == u"Gelber Sack":
 			sort = u"Gelber Sack"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Gelbe Tonne":
+		elif row[1].text.rstrip(", ").strip() == u"Gelbe Tonne":
 			sort = u"Gelbe Tonne"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Sperrmüll auf Abruf":
+		elif row[1].text.rstrip(", ").strip() == u"Sperrmüll auf Abruf":
 			sort = u"Sperrmüll"
 			date += row[2].text
-		elif row[1].text.rstrip(", ") == u"Mobile Schadstoffsammlung":
+		elif row[1].text.rstrip(", ").strip() == u"Mobile Schadstoffsammlung":
 			sort = u"Schadstoffe"
 			date += row[2].text	
 		else:
 			continue
 
-		date = date.rstrip(", ")	
+		date = date.rstrip(", ").strip()	
 		messageDict[sort]=date
+
+		print(sort,messageDict[sort])
 
 	today = dt.now(pytz.utc)
 
 	oneDay = td(days = 1)
 	tomorrow = today+oneDay
 
+	print(tomorrow.strftime('%d.%m.%Y'))
+
 	message = ''
 
-	for sort, date in messageDict.iteritems():
+	for sort, date in messageDict.items():
 		if tomorrow.strftime('%d.%m.%Y') in date:
 			message += sort + ", "
 
@@ -99,7 +103,7 @@ def lambda_handler(event, context):
 		pass
 	else:
 		message = tomorrow.strftime('%d.%m.%Y') + ": " + message
-		print message.rstrip(", ")
+		print(message.rstrip(", "))
 
 		client = boto3.client('sns')
 		response = client.publish(
