@@ -8,7 +8,7 @@ If any garbage collection takes place the next day at my address, an SNS notific
 Files:
 
 - dependencies.zip
-  All ec2 precompiled python modules for AWS lambda usage needed for abfall.py.
+  All ec2 precompiled python modules for AWS lambda usage needed for abfall.py. (will only work with EC2 Amazon Linux, do not use locally)
 
 - abfall.py 
   Contains the main lambda entry point.
