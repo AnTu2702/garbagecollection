@@ -84,14 +84,10 @@ def lambda_handler(event, context):
 		date = date.rstrip(", ").strip()	
 		messageDict[sort]=date
 
-		print(sort,messageDict[sort])
-
 	today = dt.now(pytz.utc)
 
 	oneDay = td(days = 1)
 	tomorrow = today+oneDay
-
-	print(tomorrow.strftime('%d.%m.%Y'))
 
 	message = ''
 
